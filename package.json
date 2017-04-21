@@ -1,0 +1,52 @@
+{
+  "name": "www-readability",
+  "private": true,
+  "dependencies": {
+    "automated-readability": "^1.0.0",
+    "coleman-liau": "^1.0.0",
+    "compute-mean": "^3.0.0",
+    "compute-median": "^2.0.0",
+    "compute-mode": "^1.0.0",
+    "dale-chall": "^1.0.0",
+    "dale-chall-formula": "^1.0.0",
+    "debounce": "^1.0.0",
+    "flesch": "^1.0.0",
+    "global": "^4.3.1",
+    "gunning-fog": "^1.0.1",
+    "lerp": "^1.0.3",
+    "nlcst-normalize": "^2.1.0",
+    "nlcst-to-string": "^2.0.0",
+    "retext-english": "^3.0.0",
+    "smog-formula": "^1.0.0",
+    "spache": "^1.1.0",
+    "spache-formula": "^1.0.0",
+    "syllable": "^2.0.0",
+    "unified": "^6.0.0",
+    "unist-util-visit": "^1.1.1",
+    "unlerp": "^1.0.1",
+    "virtual-dom": "^2.1.1",
+    "xtend": "^4.0.1"
+  },
+  "devDependencies": {
+    "browserify": "^14.0.0",
+    "bundle-collapser": "^1.2.1",
+    "esmangle": "^1.0.1",
+    "xo": "^0.18.1"
+  },
+  "scripts": {
+    "bundle": "browserify -p bundle-collapser/plugin index.js | esmangle > build.js",
+    "build": "npm run bundle",
+    "lint": "xo",
+    "test": "npm run build && npm run lint"
+  },
+  "xo": {
+    "space": true,
+    "esnext": false,
+    "rules": {
+      "capitalized-comments": "off"
+    },
+    "ignore": [
+      "build.js"
+    ]
+  }
+}

@@ -1,0 +1,138 @@
+html, select, button {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  font-size: 16px;
+  line-height: 1.5;
+  color: hsl(300, 95%, 4%);
+}
+
+html {
+  background-color: hsl(300, 95%, 98%);
+}
+
+.draw, ol { -webkit-print-color-adjust: exact; }
+
+.draw { color: transparent; }
+
+textarea { color: inherit; }
+
+.credits { text-align: center; margin-bottom: 0; }
+
+a {
+  color: hsl(300, 95%, 43%);
+  text-decoration: none;
+  transition: color 200ms;
+}
+
+a:focus, a:hover { color: initial; }
+
+template { display: none; }
+
+body {
+  margin: 0;
+  padding: 1em 1em 0 1em;
+}
+
+aside > :first-child { margin-top: 0; }
+aside > :last-child { margin-bottom: 0; }
+
+h1 {
+  line-height: 1;
+  font-weight: 100;
+  text-align: center;
+}
+
+aside {
+  font-size: 14px;
+  max-width: 42.2857142857em; /* 37 * (16 / 14) */
+  margin: 1em auto;
+  padding: 1rem;
+  font-style: italic;
+  line-height: 1.7142857143; /* 1.5 * (16 / 14) */
+  color: rgba(0, 0, 0, 0.5);
+  background-color: hsl(300, 95%, 95%);
+}
+
+aside em {
+  color: black;
+}
+
+.editor {
+  position: relative;
+  max-width: 37em;
+  margin: auto;
+  overflow: hidden;
+}
+
+textarea, .draw {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* Can’t use a nice font: kerning renders differently in textareas. */
+  font-family: monospace;
+  line-height: inherit;
+  font-size: inherit;
+  background: transparent;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.draw {
+  min-height: -webkit-calc(100vh - 8em);
+  min-height: -moz-calc(100vh - 8em);
+  min-height: calc(100vh - 8em);
+}
+
+textarea {
+  position: absolute;
+  top: 0;
+  overflow-y: auto;
+}
+
+.colors {
+  padding-left: 0;
+  list-style-type: none;
+  color: white;
+  transition: opacity 200ms;
+}
+
+.colors li {
+  text-align: center;
+}
+
+input, select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  border: 0;
+  font: inherit;
+  padding: 0 0.2em;
+  margin: 0;
+  border-radius: 3px;
+  color: black;
+  background-color: hsla(210, 13%, 12%, 0.1);
+}
+
+input[type=number] {
+  width: 2.5em;
+}
+
+@media (min-width: 75em) { /* (37 * 2) + 1 */
+  aside {
+    margin: 0;
+    margin-left: 22.1428571429em;
+    max-width: 21.1428571429em; /* 37 * (16 / 14) * 1/2 */
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    right: 0;
+    overflow: scroll;
+  }
+}
