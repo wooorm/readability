@@ -108,6 +108,7 @@ function onchange() {
 function render(state) {
   var tree = processor.runSync(processor.parse(state.value));
   var change = debounce(onchangevalue, 4);
+  var changeage = debounce(onchangeage, 4);
   var key = 0;
   var unselected = true;
   var options = templates.map(function (template, index) {
@@ -148,7 +149,10 @@ function render(state) {
           type: 'number',
           min: minAge,
           max: maxAge,
-          onchange: onchangeage,
+          oninput: changeage,
+          onpaste: changeage,
+          onkeyup: changeage,
+          onmouseup: changeage,
           attributes: {
             value: defaultAge
           }
