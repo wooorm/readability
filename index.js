@@ -359,7 +359,7 @@ function rows(node) {
   return ceil(
     node.getBoundingClientRect().height /
     parseInt(win.getComputedStyle(node).lineHeight, 10)
-  );
+  ) + 1;
 }
 
 function optionForTemplate(template) {

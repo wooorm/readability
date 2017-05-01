@@ -70,8 +70,7 @@ textarea, .draw {
   border: none;
   outline: none;
   resize: none;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
   /* Can’t use a nice font: kerning renders differently in textareas. */
   font-family: monospace;
   line-height: inherit;
@@ -92,7 +91,6 @@ textarea, .draw {
 textarea {
   position: absolute;
   top: 0;
-  overflow-y: auto;
 }
 
 .colors {
