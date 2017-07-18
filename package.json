@@ -30,14 +30,25 @@
   "devDependencies": {
     "browserify": "^14.0.0",
     "bundle-collapser": "^1.2.1",
+    "cssnano": "^3.10.0",
     "esmangle": "^1.0.1",
+    "postcss-cli": "^4.1.0",
+    "rehype-cli": "^3.0.0",
+    "rehype-preset-minify": "^2.0.0",
+    "stylelint": "^8.0.0",
+    "stylelint-config-standard": "^17.0.0",
     "xo": "^0.18.1"
   },
   "scripts": {
-    "bundle": "browserify -p bundle-collapser/plugin index.js | esmangle > build.js",
-    "build": "npm run bundle",
-    "lint": "xo",
+    "build:js": "browserify -p bundle-collapser/plugin src/index.js | esmangle > dest/index.js",
+    "build:css": "postcss src/index.css > dest/index.css",
+    "build:html": "rehype -u preset-minify src/index.html -o dest",
+    "build": "npm run build:js && npm run build:css && npm run build:html",
+    "lint": "xo && stylelint src/index.css",
     "test": "npm run build && npm run lint"
+  },
+  "stylelint": {
+    "extends": "stylelint-config-standard"
   },
   "xo": {
     "space": true,
@@ -46,7 +57,14 @@
       "capitalized-comments": "off"
     },
     "ignore": [
-      "build.js"
+      "dest"
     ]
+  },
+  "postcss": {
+    "plugins": {
+      "cssnano": {
+        "preset": "default"
+      }
+    }
   }
 }
