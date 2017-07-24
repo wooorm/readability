@@ -1,6 +1,6 @@
 ## readability
 
-[![screen-shot](screen-shot.png)](http://wooorm.com/readability)
+[![screenshot](screenshot.png)](http://wooorm.com/readability)
 
 ## Related
 
