@@ -207,7 +207,7 @@ function render(state) {
       h('p', [
         h('a', {href: 'https://github.com/wooorm/readability'}, 'Fork this website'),
         ' • ',
-        h('a', {href: 'https://github.com/wooorm/readability/blob/master/LICENSE'}, 'MIT'),
+        h('a', {href: 'https://github.com/wooorm/readability/blob/src/LICENSE'}, 'MIT'),
         ' • ',
         h('a', {href: 'http://wooorm.com'}, '@wooorm')
       ])
