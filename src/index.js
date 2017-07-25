@@ -51,7 +51,7 @@ var ceil = Math.ceil;
 var sqrt = Math.sqrt;
 
 var processor = unified().use(english);
-var root = doc.getElementById('root');
+var main = doc.getElementsByTagName('main')[0];
 var templates = [].slice.call(doc.getElementsByTagName('template'));
 
 var state = {
@@ -63,7 +63,7 @@ var state = {
 };
 
 var tree = render(state);
-var dom = root.appendChild(createElement(tree));
+var dom = main.appendChild(createElement(tree));
 
 function onchangevalue(ev) {
   var prev = state.value;
@@ -124,15 +124,28 @@ function render(state) {
   setTimeout(resize, 4);
 
   return h('div', [
-    h('aside', [
-      h('h1', {key: 0}, 'Readability'),
-      h('p', {key: 1}, [
+    h('section.highlight', [
+      h('h1', {key: 'title'}, 'Readability')
+    ]),
+    h('div', {key: 'editor', className: 'editor'}, [
+      h('div', {key: 'draw', className: 'draw'}, pad(all(tree, []))),
+      h('textarea', {
+        key: 'area',
+        value: state.value,
+        oninput: change,
+        onpaste: change,
+        onkeyup: change,
+        onmouseup: change
+      })
+    ]),
+    h('section.highlight', [
+      h('p', {key: 'byline'}, [
         'This project measures readability in text with several formulas: ',
         h('a', {href: 'https://en.wikipedia.org/wiki/Dale–Chall_readability_formula'}, 'Dale–Chall'),
         ', ',
         h('a', {href: 'https://en.wikipedia.org/wiki/Automated_readability_index'}, 'Automated Readability'),
         ', ',
-        h('a', {href: 'https://en.wikipedia.org/wiki/Coleman–Liau_index'}, 'Coleman-Liau'),
+        h('a', {href: 'https://en.wikipedia.org/wiki/Coleman–Liau_index'}, 'Coleman–Liau'),
         ', ',
         h('a', {href: 'https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests#Flesch_reading_ease'}, 'Flesch'),
         ', ',
@@ -141,6 +154,13 @@ function render(state) {
         h('a', {href: 'https://en.wikipedia.org/wiki/SMOG'}, 'SMOG'),
         ', and ',
         h('a', {href: 'https://en.wikipedia.org/wiki/Spache_readability_formula'}, 'Spache'),
+        '.'
+      ]),
+      h('p', {key: 'ps'}, [
+        'You can edit the text above, or pick a template: ',
+        h('select', {key: 'template', onchange: onchangetemplate}, [
+          unselected ? h('option', {key: '-1', selected: unselected}, '--') : null
+        ].concat(options)),
         '.'
       ]),
       h('p', {key: 2}, [
@@ -158,10 +178,12 @@ function render(state) {
           }
         }),
         '), and text will be highlighted in green if the text matches that (albeit if ',
-        'they’re still in school). Red means it’d take 6 years longer in school ',
+        'they’re still in school). Red means it would take 6 years longer in school ',
         '(so an age of ',
-        state.age + 6,
-        '), and the years between that mix gradually between green and red.'
+        h('span', {
+          title: 'Using the previous input updates the value reflected here'
+        }, String(state.age + 6)),
+        '), and the years between them mix gradually between green and red.'
       ]),
       h('p', {key: 3}, [
         'You can pick which average to use (currently ',
@@ -179,24 +201,16 @@ function render(state) {
           h('option', {key: 1, selected: true}, 'sentence')
         ]),
         ', but you can change that.'
-      ]),
-      h('p', {key: 5}, [
-        'P.S. Before I forget, you can edit the text! Or, pick a template: ',
-        h('select', {key: 'template', onchange: onchangetemplate}, [
-          unselected ? h('option', {key: '-1', selected: unselected}, '--') : null
-        ].concat(options))
       ])
     ]),
-    h('div', {key: 'editor', className: 'editor'}, [
-      h('div', {key: 'draw', className: 'draw'}, pad(all(tree, []))),
-      h('textarea', {
-        key: 'area',
-        value: state.value,
-        oninput: change,
-        onpaste: change,
-        onkeyup: change,
-        onmouseup: change
-      })
+    h('section.credits', {key: 'credits'}, [
+      h('p', [
+        h('a', {href: 'https://github.com/wooorm/readability'}, 'Fork this website'),
+        ' • ',
+        h('a', {href: 'https://github.com/wooorm/readability/blob/master/LICENSE'}, 'MIT'),
+        ' • ',
+        h('a', {href: 'http://wooorm.com'}, '@wooorm')
+      ])
     ])
   ]);
 
