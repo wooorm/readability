@@ -1,4 +1,4 @@
-## readability
+# readability
 
 [![screenshot](screenshot.png)](http://wooorm.com/readability)
 
