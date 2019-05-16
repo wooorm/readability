@@ -289,9 +289,9 @@ function render(state) {
     return result
   }
 
-  /* Trailing white-space in a `textarea` is shown, but not in a `div`
-   * with `white-space: pre-wrap`. Add a `br` to make the last newline
-   * explicit. */
+  // Trailing white-space in a `textarea` is shown, but not in a `div` with
+  // `white-space: pre-wrap`.
+  // Add a `br` to make the last newline explicit.
   function pad(nodes) {
     var tail = nodes[nodes.length - 1]
 
@@ -303,7 +303,7 @@ function render(state) {
   }
 }
 
-/* Highlight a section. */
+// Highlight a section.
 function highlight(node) {
   var familiarWords = {}
   var easyWord = {}
@@ -368,11 +368,9 @@ function highlight(node) {
     syllableCount += syllables
     letters += value.length
 
-    /* Count complex words for gunning-fog based on
-     * whether they have three or more syllables
-     * and whether they aren’t proper nouns.  The
-     * last is checked a little simple, so this
-     * index might be over-eager. */
+    // Count complex words for gunning-fog based on whether they have three or
+    // more syllables and whether they aren’t proper nouns.
+    // The last is checked a little simple, so this index might be over-eager.
     if (syllables >= 3) {
       polysillabicWord++
       head = value.charAt(0)
@@ -382,7 +380,7 @@ function highlight(node) {
       }
     }
 
-    /* Find unique unfamiliar words for spache. */
+    // Find unique unfamiliar words for spache.
     if (
       spache.indexOf(normalized) !== -1 &&
       familiarWords[normalized] !== true
@@ -391,7 +389,7 @@ function highlight(node) {
       familiarWordCount++
     }
 
-    /* Find unique difficult words for dale-chall. */
+    // Find unique difficult words for dale-chall.
     if (daleChall.indexOf(normalized) !== -1 && easyWord[normalized] !== true) {
       easyWord[normalized] = true
       easyWordCount++
@@ -399,20 +397,20 @@ function highlight(node) {
   }
 }
 
-/* Calculate the typical starting age (on the higher-end) when
- * someone joins `grade` grade, in the US.
- * See https://en.wikipedia.org/wiki/Educational_stage#United_States. */
+// Calculate the typical starting age (on the higher-end) when someone joins
+// `grade` grade, in the US.
+// See <https://en.wikipedia.org/wiki/Educational_stage#United_States>.
 function gradeToAge(grade) {
   return round(grade + 5)
 }
 
-/* Calculate the age relating to a Flesch result. */
+// Calculate the age relating to a Flesch result.
 function fleschToAge(value) {
   return 20 - floor(value / 10)
 }
 
-/* Calculate the age relating to a SMOG result.
- * See http://www.readabilityformulas.com/smog-readability-formula.php. */
+// Calculate the age relating to a SMOG result.
+// See <http://www.readabilityformulas.com/smog-readability-formula.php>.
 function smogToAge(value) {
   return ceil(sqrt(value) + 2.5)
 }
