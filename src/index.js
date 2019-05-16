@@ -254,7 +254,7 @@ function render(state) {
         ' • ',
         h(
           'a',
-          {href: 'https://github.com/wooorm/readability/blob/src/LICENSE'},
+          {href: 'https://github.com/wooorm/readability/blob/src/license'},
           'MIT'
         ),
         ' • ',
