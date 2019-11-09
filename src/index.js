@@ -381,16 +381,13 @@ function highlight(node) {
     }
 
     // Find unique unfamiliar words for spache.
-    if (
-      spache.indexOf(normalized) !== -1 &&
-      familiarWords[normalized] !== true
-    ) {
+    if (spache.includes(normalized) && familiarWords[normalized] !== true) {
       familiarWords[normalized] = true
       familiarWordCount++
     }
 
     // Find unique difficult words for dale-chall.
-    if (daleChall.indexOf(normalized) !== -1 && easyWord[normalized] !== true) {
+    if (daleChall.includes(normalized) && easyWord[normalized] !== true) {
       easyWord[normalized] = true
       easyWordCount++
     }
