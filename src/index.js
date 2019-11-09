@@ -350,7 +350,7 @@ function highlight(node) {
 
   return {
     style: {
-      backgroundColor: 'hsl(' + [hue, '93%', '85%'].join(', ') + ')'
+      backgroundColor: 'hsla(' + [hue, '93%', '70%', 0.5].join(', ') + ')'
     }
   }
 

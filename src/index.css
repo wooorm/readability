@@ -1,5 +1,6 @@
-html {
-  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", "Oxygen", "Ubuntu", "Cantarell", "Open Sans", sans-serif;
+:root {
+  color-scheme: light dark;
+  font-family: system-ui;
   background-color: hsl(0, 0%, 95%);
   word-break: break-word;
 }
@@ -25,7 +26,9 @@ main {
   }
 }
 
-main > div { border-radius: inherit; }
+main > div {
+  border-radius: inherit;
+}
 
 section {
   margin: calc(2em + 2ex) calc(-2em - 2ex);
@@ -61,7 +64,9 @@ section:last-child {
   margin-bottom: 0;
 }
 
-.highlight { background-color: hsl(0, 0%, 100%); }
+.highlight {
+  background-color: hsl(0, 0%, 100%);
+}
 
 * {
   line-height: calc(1em + 1ex);
@@ -93,9 +98,13 @@ a:target {
   color: inherit;
 }
 
-template { display: none; }
+template {
+  display: none;
+}
 
-[title] { border-bottom: 1px dotted; }
+[title] {
+  border-bottom: 1px dotted;
+}
 
 .editor {
   position: relative;
@@ -137,20 +146,34 @@ textarea {
 
 input,
 select {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  border: 0;
   font: inherit;
-  padding: 0 0.2em;
-  margin: 0;
-  border-radius: 3px;
-  color: inherit;
-  background-color: hsl(0, 0%, 95%);
 }
 
-input[type=number] {
-  width: 2.5em;
+.credits {
+  text-align: center;
 }
 
-.credits { text-align: center; }
+@media (prefers-color-scheme: dark) {
+  :root {
+    background-color: hsl(214, 13%, 7.5%);
+    color: hsl(214, 13%, 95%);
+  }
+
+  main {
+    background-color: hsl(214, 13%, 5%);
+  }
+
+  @media (min-width: 40em) and (min-height: 20em) {
+    main {
+      border-color: hsl(214, 13%, 12.5%);
+    }
+  }
+
+  .highlight {
+    background-color: hsl(214, 13%, 2.5%);
+  }
+
+  section {
+    border-color: hsl(214, 13%, 12.5%);
+  }
+}
