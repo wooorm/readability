@@ -48,7 +48,6 @@ var min = Math.min
 var floor = Math.floor
 var round = Math.round
 var ceil = Math.ceil
-var sqrt = Math.sqrt
 
 var processor = unified().use(english)
 var main = doc.querySelectorAll('main')[0]
@@ -340,7 +339,7 @@ function highlight(node) {
     gradeToAge(ari(counts)),
     gradeToAge(colemanLiau(counts)),
     fleschToAge(flesch(counts)),
-    smogToAge(smog(counts)),
+    gradeToAge(smog(counts)),
     gradeToAge(gunningFog(counts)),
     gradeToAge(spacheFormula(counts))
   ])
@@ -404,12 +403,6 @@ function gradeToAge(grade) {
 // Calculate the age relating to a Flesch result.
 function fleschToAge(value) {
   return age(20 - floor(value / 10))
-}
-
-// Calculate the age relating to a SMOG result.
-// See <http://www.readabilityformulas.com/smog-readability-formula.php>.
-function smogToAge(value) {
-  return age(ceil(sqrt(value) + 2.5))
 }
 
 function age(value) {
