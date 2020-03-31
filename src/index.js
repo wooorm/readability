@@ -66,10 +66,10 @@ var tree = render(state)
 var dom = main.appendChild(createElement(tree))
 
 function onchangevalue(ev) {
-  var prev = state.value
+  var previous = state.value
   var next = ev.target.value
 
-  if (prev !== next) {
+  if (previous !== next) {
     state.value = next
     state.template = null
     onchange()
@@ -111,7 +111,7 @@ function render(state) {
   var changeage = debounce(onchangeage, 4)
   var key = 0
   var unselected = true
-  var options = templates.map(function(template, index) {
+  var options = templates.map(function (template, index) {
     var selected = optionForTemplate(template) === state.template
 
     if (selected) {
