@@ -398,18 +398,23 @@ function highlight(node) {
 // `grade` grade, in the US.
 // See <https://en.wikipedia.org/wiki/Educational_stage#United_States>.
 function gradeToAge(grade) {
-  return round(grade + 5)
+  return age(round(grade + 5))
 }
 
 // Calculate the age relating to a Flesch result.
 function fleschToAge(value) {
-  return 20 - floor(value / 10)
+  return age(20 - floor(value / 10))
 }
 
 // Calculate the age relating to a SMOG result.
 // See <http://www.readabilityformulas.com/smog-readability-formula.php>.
 function smogToAge(value) {
-  return ceil(sqrt(value) + 2.5)
+  return age(ceil(sqrt(value) + 2.5))
+}
+
+function age(value) {
+  var max = 22
+  return value > max ? max : value
 }
 
 function rows(node) {
