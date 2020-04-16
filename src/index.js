@@ -8,24 +8,13 @@ var debounce = require('debounce')
 var xtend = require('xtend')
 var mean = require('compute-mean')
 var median = require('compute-median')
-var mode = require('compute-mode')
+// Var mode = require('compute-mode')
 var unlerp = require('unlerp')
 var lerp = require('lerp')
 var unified = require('unified')
 var english = require('retext-english')
-var visit = require('unist-util-visit')
-var toString = require('nlcst-to-string')
-var normalize = require('nlcst-normalize')
-var syllable = require('syllable')
-var spache = require('spache')
-var daleChall = require('dale-chall')
-var daleChallFormula = require('dale-chall-formula')
-var ari = require('automated-readability')
-var colemanLiau = require('coleman-liau')
-var flesch = require('flesch')
-var smog = require('smog-formula')
-var gunningFog = require('gunning-fog')
-var spacheFormula = require('spache-formula')
+var stringify = require('retext-stringify')
+var readabilityScores = require('readability-scores')
 
 var averages = {
   mean: mean,
@@ -45,11 +34,47 @@ var scale = 6
 
 var max = Math.max
 var min = Math.min
-var floor = Math.floor
 var round = Math.round
 var ceil = Math.ceil
 
-var processor = unified().use(english)
+// Mode Copyright (c) 2014. Athan Reines.
+// copied from \node_modules\compute-mode\lib\index.js, plus bug fix
+function mode(array) {
+  if (!Array.isArray(array)) {
+    throw new TypeError(
+      'mode()::invalid input argument. Must provide an array.'
+    )
+  }
+
+  var length = array.length
+  var count = {}
+  var max = 0
+  var vals = []
+  var value
+
+  for (var i = 0; i < length; i++) {
+    value = array[i]
+    if (!count[value]) {
+      count[value] = 0
+    }
+
+    count[value] += 1
+    if (count[value] === max) {
+      vals.push(value)
+      // Fix from PR2:
+    } else if (count[value] > max) {
+      max = count[value]
+      vals = [value]
+    }
+  }
+
+  //	Return vals.sort(function sort(a, b) {
+  //		return a - b
+  //	})
+  return vals
+} // End FUNCTION mode()
+
+var processor = unified().use(english).use(stringify)
 var main = doc.querySelectorAll('main')[0]
 var templates = [].slice.call(doc.querySelectorAll('template'))
 
@@ -304,44 +329,20 @@ function render(state) {
 
 // Highlight a section.
 function highlight(node) {
-  var familiarWords = {}
-  var easyWord = {}
-  var complexPolysillabicWord = 0
-  var familiarWordCount = 0
-  var polysillabicWord = 0
-  var syllableCount = 0
-  var easyWordCount = 0
-  var wordCount = 0
-  var letters = 0
-  var sentenceCount = 0
-  var counts
+  var text = processor.stringify(node)
+  var results = readabilityScores(text)
   var average
   var weight
   var hue
-
-  visit(node, 'SentenceNode', sentence)
-  visit(node, 'WordNode', word)
-
-  counts = {
-    complexPolysillabicWord: complexPolysillabicWord,
-    polysillabicWord: polysillabicWord,
-    unfamiliarWord: wordCount - familiarWordCount,
-    difficultWord: wordCount - easyWordCount,
-    syllable: syllableCount,
-    sentence: sentenceCount,
-    word: wordCount,
-    character: letters,
-    letter: letters
-  }
-
   average = averages[state.average]([
-    gradeToAge(daleChallFormula.gradeLevel(daleChallFormula(counts))[1]),
-    gradeToAge(ari(counts)),
-    gradeToAge(colemanLiau(counts)),
-    fleschToAge(flesch(counts)),
-    gradeToAge(smog(counts)),
-    gradeToAge(gunningFog(counts)),
-    gradeToAge(spacheFormula(counts))
+    gradeToAge(results.daleChall),
+    gradeToAge(results.ari),
+    gradeToAge(results.colemanLiau),
+    gradeToAge(results.fleschKincaid),
+    gradeToAge(results.smog),
+    gradeToAge(results.gunningFog),
+    // Spache is apparently best for children under age 8. If Spache returns a grade of 4 or higher, we should use Dale-Chall instead. readabilityScores has an opt-in config option to calculate it.
+    gradeToAge(readabilityScores(text, {onlySpache: true}).spache)
   ])
 
   weight = unlerp(state.age, state.age + scale, average)
@@ -352,45 +353,6 @@ function highlight(node) {
       backgroundColor: 'hsla(' + [hue, '93%', '70%', 0.5].join(', ') + ')'
     }
   }
-
-  function sentence() {
-    sentenceCount++
-  }
-
-  function word(node) {
-    var value = toString(node)
-    var syllables = syllable(value)
-    var normalized = normalize(node, {allowApostrophes: true})
-    var head
-
-    wordCount++
-    syllableCount += syllables
-    letters += value.length
-
-    // Count complex words for gunning-fog based on whether they have three or
-    // more syllables and whether they aren’t proper nouns.
-    // The last is checked a little simple, so this index might be over-eager.
-    if (syllables >= 3) {
-      polysillabicWord++
-      head = value.charAt(0)
-
-      if (head === head.toLowerCase()) {
-        complexPolysillabicWord++
-      }
-    }
-
-    // Find unique unfamiliar words for spache.
-    if (spache.includes(normalized) && familiarWords[normalized] !== true) {
-      familiarWords[normalized] = true
-      familiarWordCount++
-    }
-
-    // Find unique difficult words for dale-chall.
-    if (daleChall.includes(normalized) && easyWord[normalized] !== true) {
-      easyWord[normalized] = true
-      easyWordCount++
-    }
-  }
 }
 
 // Calculate the typical starting age (on the higher-end) when someone joins
@@ -398,11 +360,6 @@ function highlight(node) {
 // See <https://en.wikipedia.org/wiki/Educational_stage#United_States>.
 function gradeToAge(grade) {
   return age(round(grade + 5))
-}
-
-// Calculate the age relating to a Flesch result.
-function fleschToAge(value) {
-  return age(20 - floor(value / 10))
 }
 
 function age(value) {
