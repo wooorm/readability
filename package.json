@@ -14,7 +14,7 @@
     "debounce": "^1.0.0",
     "global": "^4.0.0",
     "lerp": "^1.0.0",
-    "readability-scores": "^1.0.1",
+    "readability-scores": "^1.0.2",
     "retext-english": "^3.0.0",
     "retext-stringify": "^2.0.4",
     "unified": "^9.0.0",
@@ -32,7 +32,7 @@
     "rehype-prevent-favicon-request": "^2.0.0",
     "remark-cli": "^8.0.0",
     "remark-preset-wooorm": "^7.0.0",
-    "stylelint": "^13.0.0",
+    "stylelint": "^13.3.3",
     "stylelint-config-standard": "^20.0.0",
     "tinyify": "^2.0.0",
     "xo": "^0.28.0"
