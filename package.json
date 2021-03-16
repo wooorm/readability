@@ -8,6 +8,7 @@
     "Titus Wormer <tituswormer@gmail.com> (https://wooorm.com)",
     "Michael Chambers <chamicr@gmail.com>"
   ],
+  "type": "module",
   "dependencies": {
     "compute-mean": "^3.0.0",
     "compute-median": "^2.0.0",
@@ -23,8 +24,8 @@
     "xtend": "^4.0.0"
   },
   "devDependencies": {
-    "browserify": "^17.0.0",
     "cssnano": "^4.0.0",
+    "esbuild": "^0.9.0",
     "postcss-cli": "^8.0.0",
     "prettier": "^2.0.0",
     "rehype-cli": "^10.0.0",
@@ -34,12 +35,11 @@
     "remark-preset-wooorm": "^8.0.0",
     "stylelint": "^13.0.0",
     "stylelint-config-standard": "^21.0.0",
-    "tinyify": "^3.0.0",
     "xo": "^0.38.0"
   },
   "scripts": {
     "format": "remark . -qfo && prettier . -w --loglevel warn && xo --fix && stylelint src/index.css --fix",
-    "build:js": "browserify src -o dest/index.js",
+    "build:js": "esbuild src/index.js --bundle --minify --target=es6 --outfile=dest/index.nomodule.js && esbuild src/index.js --bundle --minify --target=es2020 --format=esm --outfile=dest/index.module.js",
     "build:css": "postcss src/index.css > dest/index.css",
     "build:html": "rehype -u preset-minify -u prevent-favicon-request src/index.html -o dest",
     "build": "npm run build:js && npm run build:css && npm run build:html",
@@ -58,10 +58,9 @@
   },
   "xo": {
     "prettier": true,
-    "esnext": false,
     "rules": {
-      "unicorn/prefer-dom-node-append": "off",
-      "unicorn/prefer-number-properties": "off"
+      "no-var": "off",
+      "unicorn/prefer-dom-node-append": "off"
     }
   },
   "postcss": {

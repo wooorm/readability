@@ -1,24 +1,23 @@
-var doc = require('global/document')
-var win = require('global/window')
-var createElement = require('virtual-dom/create-element')
-var diff = require('virtual-dom/diff')
-var patch = require('virtual-dom/patch')
-var h = require('virtual-dom/h')
-var debounce = require('debounce')
-var xtend = require('xtend')
-var mean = require('compute-mean')
-var median = require('compute-median')
-// Var mode = require('compute-mode')
-var unlerp = require('unlerp')
-var lerp = require('lerp')
-var unified = require('unified')
-var english = require('retext-english')
-var stringify = require('retext-stringify')
-var readabilityScores = require('readability-scores')
+import doc from 'global/document.js'
+import win from 'global/window.js'
+import createElement from 'virtual-dom/create-element.js'
+import diff from 'virtual-dom/diff.js'
+import patch from 'virtual-dom/patch.js'
+import h from 'virtual-dom/h.js'
+import debounce from 'debounce'
+import xtend from 'xtend'
+import mean from 'compute-mean'
+import median from 'compute-median'
+import unlerp from 'unlerp'
+import lerp from 'lerp'
+import unified from 'unified'
+import english from 'retext-english'
+import stringify from 'retext-stringify'
+import readabilityScores from 'readability-scores'
 
 var averages = {
-  mean: mean,
-  median: median,
+  mean,
+  median,
   mode: modeMean
 }
 
@@ -135,18 +134,14 @@ function render(state) {
   var changeage = debounce(onchangeage, 4)
   var key = 0
   var unselected = true
-  var options = templates.map(function (template, index) {
+  var options = templates.map((template, index) => {
     var selected = optionForTemplate(template) === state.template
 
     if (selected) {
       unselected = false
     }
 
-    return h(
-      'option',
-      {key: index, selected: selected},
-      optionForTemplate(template)
-    )
+    return h('option', {key: index, selected}, optionForTemplate(template))
   })
 
   setTimeout(resize, 4)
@@ -306,7 +301,7 @@ function render(state) {
     var attrs = node.type === state.type ? highlight(node) : null
 
     if (attrs) {
-      result = h('span', xtend({key: id, id: id}, attrs), result)
+      result = h('span', xtend({key: id, id}, attrs), result)
       key++
     }
 
@@ -375,7 +370,7 @@ function rows(node) {
   return (
     ceil(
       node.getBoundingClientRect().height /
-        parseInt(win.getComputedStyle(node).lineHeight, 10)
+        Number.parseInt(win.getComputedStyle(node).lineHeight, 10)
     ) + 1
   )
 }
