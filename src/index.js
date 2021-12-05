@@ -10,31 +10,31 @@ import mean from 'compute-mean'
 import median from 'compute-median'
 import unlerp from 'unlerp'
 import lerp from 'lerp'
-import unified from 'unified'
-import english from 'retext-english'
-import stringify from 'retext-stringify'
+import {unified} from 'unified'
+import retextEnglish from 'retext-english'
+import retextStringify from 'retext-stringify'
 import readabilityScores from 'readability-scores'
 
-var averages = {
+const averages = {
   mean,
   median,
   mode: modeMean
 }
 
-var types = {
+const types = {
   sentence: 'SentenceNode',
   paragraph: 'ParagraphNode'
 }
 
-var minAge = 5
-var maxAge = 22
-var defaultAge = 12
-var scale = 6
+const minAge = 5
+const maxAge = 22
+const defaultAge = 12
+const scale = 6
 
-var max = Math.max
-var min = Math.min
-var round = Math.round
-var ceil = Math.ceil
+const max = Math.max
+const min = Math.min
+const round = Math.round
+const ceil = Math.ceil
 
 // Mode Copyright (c) 2014. Athan Reines.
 // copied from \node_modules\compute-mode\lib\index.js, plus bug fix
@@ -45,13 +45,13 @@ function mode(array) {
     )
   }
 
-  var length = array.length
-  var count = {}
-  var max = 0
-  var vals = []
-  var value
+  const length = array.length
+  const count = {}
+  let max = 0
+  let vals = []
+  let value
 
-  for (var i = 0; i < length; i++) {
+  for (let i = 0; i < length; i++) {
     value = array[i]
     if (!count[value]) {
       count[value] = 0
@@ -67,17 +67,19 @@ function mode(array) {
     }
   }
 
-  //	Return vals.sort(function sort(a, b) {
-  //		return a - b
-  //	})
+  // ```
+  // return vals.sort(function sort(a, b) {
+  //  return a - b
+  // })
+  // ```
   return vals
 } // End FUNCTION mode()
 
-var processor = unified().use(english).use(stringify)
-var main = doc.querySelectorAll('main')[0]
-var templates = [].slice.call(doc.querySelectorAll('template'))
+const processor = unified().use(retextEnglish).use(retextStringify)
+const main = doc.querySelectorAll('main')[0]
+const templates = [...doc.querySelectorAll('template')]
 
-var state = {
+const state = {
   type: 'SentenceNode',
   average: 'median',
   template: optionForTemplate(templates[0]),
@@ -85,12 +87,12 @@ var state = {
   age: defaultAge
 }
 
-var tree = render(state)
-var dom = main.appendChild(createElement(tree))
+let tree = render(state)
+let dom = main.appendChild(createElement(tree))
 
 function onchangevalue(ev) {
-  var previous = state.value
-  var next = ev.target.value
+  const previous = state.value
+  const next = ev.target.value
 
   if (previous !== next) {
     state.value = next
@@ -110,8 +112,8 @@ function onchangetype(ev) {
 }
 
 function onchangetemplate(ev) {
-  var target = ev.target.selectedOptions[0]
-  var node = doc.querySelector('[data-label="' + target.textContent + '"]')
+  const target = ev.target.selectedOptions[0]
+  const node = doc.querySelector('[data-label="' + target.textContent + '"]')
   state.template = optionForTemplate(node)
   state.value = valueForTemplate(node)
   onchange()
@@ -123,19 +125,19 @@ function onchangeage(ev) {
 }
 
 function onchange() {
-  var next = render(state)
+  const next = render(state)
   dom = patch(dom, diff(tree, next))
   tree = next
 }
 
 function render(state) {
-  var tree = processor.runSync(processor.parse(state.value))
-  var change = debounce(onchangevalue, 4)
-  var changeage = debounce(onchangeage, 4)
-  var key = 0
-  var unselected = true
-  var options = templates.map((template, index) => {
-    var selected = optionForTemplate(template) === state.template
+  const tree = processor.runSync(processor.parse(state.value))
+  const change = debounce(onchangevalue, 4)
+  const changeage = debounce(onchangeage, 4)
+  let key = 0
+  let unselected = true
+  const options = templates.map((template, index) => {
+    const selected = optionForTemplate(template) === state.template
 
     if (selected) {
       unselected = false
@@ -185,8 +187,7 @@ function render(state) {
         h(
           'a',
           {
-            href:
-              'https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests#Flesch_reading_ease'
+            href: 'https://en.wikipedia.org/wiki/Flesch–Kincaid_readability_tests#Flesch_reading_ease'
           },
           'Flesch'
         ),
@@ -283,10 +284,10 @@ function render(state) {
   ])
 
   function all(node, parentIds) {
-    var children = node.children
-    var length = children.length
-    var index = -1
-    var results = []
+    const children = node.children
+    const length = children.length
+    let index = -1
+    let results = []
 
     while (++index < length) {
       results = results.concat(one(children[index], parentIds.concat(index)))
@@ -296,9 +297,9 @@ function render(state) {
   }
 
   function one(node, parentIds) {
-    var result = 'value' in node ? node.value : all(node, parentIds)
-    var id = parentIds.join('-') + '-' + key
-    var attrs = node.type === state.type ? highlight(node) : null
+    let result = 'value' in node ? node.value : all(node, parentIds)
+    const id = parentIds.join('-') + '-' + key
+    const attrs = node.type === state.type ? highlight(node) : null
 
     if (attrs) {
       result = h('span', xtend({key: id, id}, attrs), result)
@@ -312,7 +313,7 @@ function render(state) {
   // `white-space: pre-wrap`.
   // Add a `br` to make the last newline explicit.
   function pad(nodes) {
-    var tail = nodes[nodes.length - 1]
+    const tail = nodes[nodes.length - 1]
 
     if (typeof tail === 'string' && tail.charAt(tail.length - 1) === '\n') {
       nodes.push(h('br', {key: 'break'}))
@@ -324,12 +325,9 @@ function render(state) {
 
 // Highlight a section.
 function highlight(node) {
-  var text = processor.stringify(node)
-  var results = readabilityScores(text)
-  var average
-  var weight
-  var hue
-  average = averages[state.average]([
+  const text = processor.stringify(node)
+  const results = readabilityScores(text)
+  const average = averages[state.average]([
     gradeToAge(results.daleChall),
     gradeToAge(results.ari),
     gradeToAge(results.colemanLiau),
@@ -340,8 +338,8 @@ function highlight(node) {
     gradeToAge(readabilityScores(text, {onlySpache: true}).spache)
   ])
 
-  weight = unlerp(state.age, state.age + scale, average)
-  hue = lerp(120, 0, min(1, max(0, weight)))
+  const weight = unlerp(state.age, state.age + scale, average)
+  const hue = lerp(120, 0, min(1, max(0, weight)))
 
   return {
     style: {
@@ -358,7 +356,7 @@ function gradeToAge(grade) {
 }
 
 function age(value) {
-  var max = 22
+  const max = 22
   return value > max ? max : value
 }
 
