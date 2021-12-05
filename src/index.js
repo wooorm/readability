@@ -301,7 +301,7 @@ function render(state) {
     const attrs = node.type === state.type ? highlight(node) : null
 
     if (attrs) {
-      result = h('span', {key: id, id, ...attrs}), result)
+      result = h('span', {key: id, id, ...attrs}, result)
       key++
     }
 
