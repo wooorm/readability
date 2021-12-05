@@ -5,7 +5,6 @@ import diff from 'virtual-dom/diff.js'
 import patch from 'virtual-dom/patch.js'
 import h from 'virtual-dom/h.js'
 import debounce from 'debounce'
-import xtend from 'xtend'
 import mean from 'compute-mean'
 import median from 'compute-median'
 import unlerp from 'unlerp'
@@ -302,7 +301,7 @@ function render(state) {
     const attrs = node.type === state.type ? highlight(node) : null
 
     if (attrs) {
-      result = h('span', xtend({key: id, id}, attrs), result)
+      result = h('span', {key: id, id, ...attrs}), result)
       key++
     }
 

@@ -20,8 +20,7 @@
     "retext-stringify": "^3.0.0",
     "unified": "^10.0.0",
     "unlerp": "^1.0.0",
-    "virtual-dom": "^2.0.0",
-    "xtend": "^4.0.0"
+    "virtual-dom": "^2.0.0"
   },
   "devDependencies": {
     "cssnano": "^5.0.0",
