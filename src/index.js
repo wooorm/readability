@@ -1,25 +1,49 @@
-import doc from 'global/document.js'
-import win from 'global/window.js'
-import createElement from 'virtual-dom/create-element.js'
-import diff from 'virtual-dom/diff.js'
-import patch from 'virtual-dom/patch.js'
-import h from 'virtual-dom/h.js'
+/// <reference lib="dom" />
+/* eslint-env browser */
+
+/**
+ * @typedef {import('virtual-dom').VNode} VNode
+ * @typedef {import('virtual-dom').VProperties} VProperties
+ * @typedef {import('nlcst').Parent} NlcstParent
+ * @typedef {import('nlcst').Root} NlcstRoot
+ * @typedef {import('nlcst').Content} NlcstContent
+ * @typedef {NlcstRoot | NlcstContent} NlcstNode
+ *
+ * @typedef {'mean'|'median'|'mode'} Average
+ *
+ * @typedef State
+ * @property {'SentenceNode'|'ParagraphNode'} type
+ * @property {string|null} template
+ * @property {string} value
+ * @property {Average} average
+ * @property {number} age
+ */
+
+import virtualDom from 'virtual-dom'
 import debounce from 'debounce'
+// @ts-expect-error: untyped.
 import mean from 'compute-mean'
+// @ts-expect-error: untyped.
 import median from 'compute-median'
+// @ts-expect-error: untyped.
 import unlerp from 'unlerp'
+// @ts-expect-error: untyped.
 import lerp from 'lerp'
 import {unified} from 'unified'
 import retextEnglish from 'retext-english'
 import retextStringify from 'retext-stringify'
 import readabilityScores from 'readability-scores'
 
+const {create, h, diff, patch} = virtualDom
+
+/** @type {Record<Average, (value: Array<number>) => number>} */
 const averages = {
   mean,
   median,
   mode: modeMean
 }
 
+/** @type {Record<string, State['type']>} */
 const types = {
   sentence: 'SentenceNode',
   paragraph: 'ParagraphNode'
@@ -37,6 +61,10 @@ const ceil = Math.ceil
 
 // Mode Copyright (c) 2014. Athan Reines.
 // copied from \node_modules\compute-mode\lib\index.js, plus bug fix
+/**
+ * @param {Array<number>} array
+ * @returns {Array<number>}
+ */
 function mode(array) {
   if (!Array.isArray(array)) {
     throw new TypeError(
@@ -45,13 +73,14 @@ function mode(array) {
   }
 
   const length = array.length
+  /** @type {Record<number, number>} */
   const count = {}
   let max = 0
+  /** @type {Array<number>} */
   let vals = []
-  let value
 
   for (let i = 0; i < length; i++) {
-    value = array[i]
+    const value = array[i]
     if (!count[value]) {
       count[value] = 0
     }
@@ -75,9 +104,10 @@ function mode(array) {
 } // End FUNCTION mode()
 
 const processor = unified().use(retextEnglish).use(retextStringify)
-const main = doc.querySelectorAll('main')[0]
-const templates = [...doc.querySelectorAll('template')]
+const main = document.querySelectorAll('main')[0]
+const templates = Array.from(document.querySelectorAll('template'))
 
+/** @type {State} */
 const state = {
   type: 'SentenceNode',
   average: 'median',
@@ -87,40 +117,84 @@ const state = {
 }
 
 let tree = render(state)
-let dom = main.appendChild(createElement(tree))
+let dom = main.appendChild(create(tree))
 
+/**
+ * @param {KeyboardEvent|MouseEvent|ClipboardEvent} ev
+ */
 function onchangevalue(ev) {
-  const previous = state.value
-  const next = ev.target.value
+  if (
+    ev &&
+    ev.target &&
+    'value' in ev.target &&
+    typeof ev.target.value === 'string'
+  ) {
+    const previous = state.value
+    const next = ev.target.value
 
-  if (previous !== next) {
-    state.value = next
-    state.template = null
+    if (previous !== next) {
+      state.value = next
+      state.template = null
+      onchange()
+    }
+  }
+}
+
+/**
+ * @param {Event} ev
+ */
+function onchangeaverage(ev) {
+  if (
+    ev &&
+    ev.target &&
+    'value' in ev.target &&
+    typeof ev.target.value === 'string'
+  ) {
+    state.average = /** @type {Average} */ (ev.target.value.toLowerCase())
     onchange()
   }
 }
 
-function onchangeaverage(ev) {
-  state.average = ev.target.value.toLowerCase()
-  onchange()
-}
-
+/**
+ * @param {Event} ev
+ */
 function onchangetype(ev) {
-  state.type = types[ev.target.value.toLowerCase()]
-  onchange()
+  if (ev && ev.target && ev.target instanceof HTMLSelectElement) {
+    state.type = types[ev.target.value.toLowerCase()]
+    onchange()
+  }
 }
 
+/**
+ * @param {Event} ev
+ */
 function onchangetemplate(ev) {
-  const target = ev.target.selectedOptions[0]
-  const node = doc.querySelector('[data-label="' + target.textContent + '"]')
-  state.template = optionForTemplate(node)
-  state.value = valueForTemplate(node)
-  onchange()
+  if (ev && ev.target && ev.target instanceof HTMLSelectElement) {
+    const target = ev.target.selectedOptions[0]
+    const node = document.querySelector(
+      '[data-label="' + target.textContent + '"]'
+    )
+    if (node && node instanceof HTMLTemplateElement) {
+      state.template = optionForTemplate(node)
+      state.value = valueForTemplate(node)
+      onchange()
+    }
+  }
 }
 
+/**
+ * @param {Event} ev
+ */
 function onchangeage(ev) {
-  state.age = Number(ev.target.value)
-  onchange()
+  if (
+    ev &&
+    ev.target &&
+    'value' in ev.target &&
+    typeof ev.target.value === 'string'
+  ) {
+    state.age = Number(ev.target.value)
+    onchange()
+  }
 }
 
 function onchange() {
@@ -129,6 +203,10 @@ function onchange() {
   tree = next
 }
 
+/**
+ * @param {State} state
+ * @returns {VNode}
+ */
 function render(state) {
   const tree = processor.runSync(processor.parse(state.value))
   const change = debounce(onchangevalue, 4)
@@ -142,7 +220,11 @@ function render(state) {
       unselected = false
     }
 
-    return h('option', {key: index, selected}, optionForTemplate(template))
+    return h(
+      'option',
+      {key: String(index), selected},
+      optionForTemplate(template)
+    )
   })
 
   setTimeout(resize, 4)
@@ -151,14 +233,18 @@ function render(state) {
     h('section.highlight', [h('h1', {key: 'title'}, 'Readability')]),
     h('div', {key: 'editor', className: 'editor'}, [
       h('div', {key: 'draw', className: 'draw'}, pad(all(tree, []))),
-      h('textarea', {
-        key: 'area',
-        value: state.value,
-        oninput: change,
-        onpaste: change,
-        onkeyup: change,
-        onmouseup: change
-      })
+      h(
+        'textarea',
+        {
+          key: 'area',
+          value: state.value,
+          oninput: change,
+          onpaste: change,
+          onkeyup: change,
+          onmouseup: change
+        },
+        []
+      )
     ]),
     h('section.highlight', [
       h('p', {key: 'byline'}, [
@@ -208,31 +294,32 @@ function render(state) {
       ]),
       h('p', {key: 'ps'}, [
         'You can edit the text above, or pick a template: ',
-        h(
-          'select',
-          {key: 'template', onchange: onchangetemplate},
-          [
-            unselected
-              ? h('option', {key: '-1', selected: unselected}, '--')
-              : null
-          ].concat(options)
-        ),
+        h('select', {key: 'template', onchange: onchangetemplate}, [
+          unselected
+            ? h('option', {key: '-1', selected: unselected}, '--')
+            : '',
+          ...options
+        ]),
         '.'
       ]),
-      h('p', {key: 2}, [
+      h('p', {key: '2'}, [
         'You can choose which target age you want to reach (now at ',
-        h('input', {
-          type: 'number',
-          min: minAge,
-          max: maxAge,
-          oninput: changeage,
-          onpaste: changeage,
-          onkeyup: changeage,
-          onmouseup: changeage,
-          attributes: {
-            value: defaultAge
-          }
-        }),
+        h(
+          'input',
+          {
+            type: 'number',
+            min: minAge,
+            max: maxAge,
+            oninput: changeage,
+            onpaste: changeage,
+            onkeyup: changeage,
+            onmouseup: changeage,
+            attributes: {
+              value: String(defaultAge)
+            }
+          },
+          []
+        ),
         '), and text will be highlighted in green if the text matches that (albeit if ',
         'they’re still in school). Red means it would take 6 years longer in school ',
         '(so an age of ',
@@ -245,20 +332,20 @@ function render(state) {
         ),
         '), and the years between them mix gradually between green and red.'
       ]),
-      h('p', {key: 3}, [
+      h('p', {key: '3'}, [
         'You can pick which average to use (currently ',
         h('select', {key: 'average', onchange: onchangeaverage}, [
-          h('option', {key: 0}, 'mean'),
-          h('option', {key: 1, selected: true}, 'median'),
-          h('option', {key: 2}, 'mode')
+          h('option', {key: '0'}, 'mean'),
+          h('option', {key: '1', selected: true}, 'median'),
+          h('option', {key: '2'}, 'mode')
         ]),
         ').'
       ]),
-      h('p', {key: 4}, [
+      h('p', {key: '4'}, [
         'It’s now highlighting per ',
         h('select', {key: 'type', onchange: onchangetype}, [
-          h('option', {key: 0}, 'paragraph'),
-          h('option', {key: 1, selected: true}, 'sentence')
+          h('option', {key: '0'}, 'paragraph'),
+          h('option', {key: '1', selected: true}, 'sentence')
         ]),
         ', but you can change that.'
       ])
@@ -282,20 +369,39 @@ function render(state) {
     ])
   ])
 
+  /**
+   * @param {NlcstParent} node
+   * @param {Array<number>} parentIds
+   * @returns {Array<VNode|string>}
+   */
   function all(node, parentIds) {
     const children = node.children
     const length = children.length
     let index = -1
-    let results = []
+    /** @type {Array<VNode|string>} */
+    const results = []
 
     while (++index < length) {
-      results = results.concat(one(children[index], parentIds.concat(index)))
+      const ids = [...parentIds, index]
+      const result = one(children[index], ids)
+
+      if (Array.isArray(result)) {
+        results.push(...result)
+      } else {
+        results.push(result)
+      }
     }
 
     return results
   }
 
+  /**
+   * @param {NlcstNode} node
+   * @param {Array<number>} parentIds
+   * @returns {string|VNode|Array<VNode|string>}
+   */
   function one(node, parentIds) {
+    /** @type {string|VNode|Array<VNode|string>} */
     let result = 'value' in node ? node.value : all(node, parentIds)
     const id = parentIds.join('-') + '-' + key
     const attrs = node.type === state.type ? highlight(node) : null
@@ -308,33 +414,50 @@ function render(state) {
     return result
   }
 
-  // Trailing white-space in a `textarea` is shown, but not in a `div` with
-  // `white-space: pre-wrap`.
-  // Add a `br` to make the last newline explicit.
+  /**
+   * Trailing white-space in a `textarea` is shown, but not in a `div` with
+   * `white-space: pre-wrap`.
+   * Add a `br` to make the last newline explicit.
+   *
+   * @param {Array<VNode|string>} nodes
+   * @returns {Array<VNode|string>}
+   */
   function pad(nodes) {
     const tail = nodes[nodes.length - 1]
 
     if (typeof tail === 'string' && tail.charAt(tail.length - 1) === '\n') {
-      nodes.push(h('br', {key: 'break'}))
+      nodes.push(h('br', {key: 'break'}, []))
     }
 
     return nodes
   }
 }
 
-// Highlight a section.
+/**
+ * @param {NlcstNode} node
+ * @returns {VProperties|void}
+ */
 function highlight(node) {
+  // @ts-expect-error: fine.
   const text = processor.stringify(node)
   const results = readabilityScores(text)
+  // Spache is apparently best for children under age 8. If Spache returns a grade of 4 or higher, we should use Dale-Chall instead. readabilityScores has an opt-in config option to calculate it.
+  const spache = readabilityScores(text, {onlySpache: true}).spache
   const average = averages[state.average]([
+    // @ts-expect-error: types.
     gradeToAge(results.daleChall),
+    // @ts-expect-error: types.
     gradeToAge(results.ari),
+    // @ts-expect-error: types.
     gradeToAge(results.colemanLiau),
+    // @ts-expect-error: types.
     gradeToAge(results.fleschKincaid),
+    // @ts-expect-error: types.
     gradeToAge(results.smog),
+    // @ts-expect-error: types.
     gradeToAge(results.gunningFog),
-    // Spache is apparently best for children under age 8. If Spache returns a grade of 4 or higher, we should use Dale-Chall instead. readabilityScores has an opt-in config option to calculate it.
-    gradeToAge(readabilityScores(text, {onlySpache: true}).spache)
+    // @ts-expect-error: types.
+    gradeToAge(spache)
   ])
 
   const weight = unlerp(state.age, state.age + scale, average)
@@ -347,18 +470,31 @@ function highlight(node) {
   }
 }
 
-// Calculate the typical starting age (on the higher-end) when someone joins
-// `grade` grade, in the US.
-// See <https://en.wikipedia.org/wiki/Educational_stage#United_States>.
+/**
+ * Calculate the typical starting age (on the higher-end) when someone joins
+ * `grade` grade, in the US.
+ * See <https://en.wikipedia.org/wiki/Educational_stage#United_States>.
+ *
+ * @param {number} grade
+ * @returns {number}
+ */
 function gradeToAge(grade) {
   return age(round(grade + 5))
 }
 
+/**
+ * @param {number} value
+ * @returns {number}
+ */
 function age(value) {
   const max = 22
   return value > max ? max : value
 }
 
+/**
+ * @param {Element|null} node
+ * @returns {number|void}
+ */
 function rows(node) {
   if (!node) {
     return
@@ -367,23 +503,42 @@ function rows(node) {
   return (
     ceil(
       node.getBoundingClientRect().height /
-        Number.parseInt(win.getComputedStyle(node).lineHeight, 10)
+        Number.parseInt(window.getComputedStyle(node).lineHeight, 10)
     ) + 1
   )
 }
 
+/**
+ * @param {HTMLTemplateElement} template
+ * @returns {string}
+ */
 function optionForTemplate(template) {
-  return template.dataset.label
+  const label = template.dataset.label
+  if (!label) throw new Error('Expected `data-label` on `<template>`')
+  return label
 }
 
+/**
+ * @param {HTMLTemplateElement} template
+ * @returns {string}
+ */
 function valueForTemplate(template) {
   return template.innerHTML + '\n\n— ' + optionForTemplate(template)
 }
 
 function resize() {
-  dom.querySelector('textarea').rows = rows(dom.querySelector('.draw'))
+  const textarea = dom.querySelector('textarea')
+  const draw = dom.querySelector('.draw')
+  if (!textarea) throw new Error('Expected `textarea` `dom`')
+  if (!draw) throw new Error('Expected `.draw` in `dom`')
+  const result = rows(draw)
+  if (result !== undefined) textarea.rows = result
 }
 
+/**
+ * @param {Array<number>} value
+ * @returns {number}
+ */
 function modeMean(value) {
   return mean(mode(value))
 }
