@@ -4,6 +4,10 @@
 
 ## Related
 
-*   [write-music](https://github.com/wooorm/write-music)
-*   [common-words](https://github.com/wooorm/common-words)
-*   [short-words](https://github.com/wooorm/short-words)
+*   [`write-music`](https://github.com/wooorm/write-music)
+*   [`common-words`](https://github.com/wooorm/common-words)
+*   [`short-words`](https://github.com/wooorm/short-words)
+
+## License
+
+[MIT](license) © [Titus Wormer](https://wooorm.com)
